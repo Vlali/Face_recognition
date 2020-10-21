@@ -1,16 +1,32 @@
 import cv2
 cap=cv2.VideoCapture(0)
+
+
+
+def make_resolution(width,height):
+    cap.set(3,width)
+    cap.set(4,height)
+make_resolution(640,480)  # This is a only resolution,which doesnt crash my program
+
+
+def rescale_frame(frame, percent=75):
+    width = int(frame.shape[1] * percent/ 100)
+    height = int(frame.shape[0] * percent/ 100)
+    dim = (width, height)
+    return cv2.resize(frame, dim, interpolation =cv2.INTER_AREA)
+
+
 while True:
     ret,frame=cap.read()
-    red=cv2.cvtColor(frame,cv2.COLOR_YCR_CB2BGR)
-    cv2.imshow('frame',frame)
-    cv2.imshow('red',red)
-    cv2.imshow('frame3',frame)
-    cv2.imshow('frame4',frame)
-    cv2.imshow('frame5',frame)
-    cv2.imshow('frame6',frame)
-    cv2.imshow('frame7',frame)
-    if cv2.waitKey(50) & 0xFF == ord('q'):
+    green=cv2.cvtColor(frame,cv2.COLOR_YCR_CB2BGR)
+    n_frame=rescale_frame(frame,percent=50) #This is your new_frame,which can you rescale or upscale
+
+    cv2.imshow('green',green)
+    cv2.imshow('n_frame',n_frame)
+
+    if cv2.waitKey(50) & 0xFF == ord('q'):  # to quit a webcam
         break
+
+
 cap.release()
 cv2.destroyAllWindows()
