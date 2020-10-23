@@ -1,28 +1,34 @@
 import cv2
+#you cant record audio with opencv,if you want you can use ffmpeg
 cap=cv2.VideoCapture(0)
 
-
-
-def make_resolution(width,height):
-    cap.set(3,width)
-    cap.set(4,height)
-make_resolution(640,480)  # This is a only resolution,which doesnt crash my program
-
-
-def rescale_frame(frame, percent=75):
-    width = int(frame.shape[1] * percent/ 100)
-    height = int(frame.shape[0] * percent/ 100)
-    dim = (width, height)
-    return cv2.resize(frame, dim, interpolation =cv2.INTER_AREA)
-
-
+#Imports a xml module,which will recognize your face
+face_cascade=cv2.CascadeClassifier('data/haarcascades/haarcascade_frontalface_alt2.xml')
 while True:
     ret,frame=cap.read()
-    green=cv2.cvtColor(frame,cv2.COLOR_YCR_CB2BGR)
-    n_frame=rescale_frame(frame,percent=50) #This is your new_frame,which can you rescale or upscale
-
-    cv2.imshow('green',green)
-    cv2.imshow('n_frame',n_frame)
+    gray=cv2.cvtColor(frame,cv2.COLOR_BGR2GRAY)
+    
+    #face recognizing
+    #we must use gray because this xml detect face in gray,after the cordinates,we can draw a rectangle around your face
+    faces=face_cascade.detectMultiScale(gray,scaleFactor=1.5,minNeighbors=5)
+    for(x,y,w,h) in faces:
+        print(x,y,w,h)
+        roi_gray=gray[y:y+h,x:x+w]   #cordinates
+        roi_color=frame[y:y+h,x:x+w]
+        
+        #creates an image of your face
+        img_item='my-image.png'
+        cv2.imwrite(img_item,roi_gray) 
+        
+        #draw a rectangle around your face
+        color=(255,0,0)  #BGR
+        stroke=2
+        end_cord_x=x+w
+        end_cord_y=y+h
+        cv2.rectangle(frame,(x,y),(end_cord_x,end_cord_y),color,stroke)
+        
+    #display the resulting frame              
+    cv2.imshow('frame',frame)
 
     if cv2.waitKey(50) & 0xFF == ord('q'):  # to quit a webcam
         break
